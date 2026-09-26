@@ -1,5 +1,6 @@
 com\pharmacy\models\User.class
 com\pharmacy\database\DatabaseConnection.class
+com\pharmacy\dao\CustomerDAO.class
 com\pharmacy\models\Sale.class
 com\pharmacy\models\User$Role.class
 com\pharmacy\dao\MedicineDAO.class

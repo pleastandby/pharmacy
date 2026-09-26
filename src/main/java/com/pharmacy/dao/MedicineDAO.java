@@ -103,4 +103,20 @@ public class MedicineDAO {
         }
     }
 
+    public void deleteMedicineById(int id){
+        String sql = "DELETE FROM medicines WHERE id=?";
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement pstmtDelete = conn.prepareStatement(sql);
+        ){
+            Medicine med = this.getMedicineById(id);
+            pstmtDelete.setInt(1, id);
+            pstmtDelete.executeUpdate();
+            System.out.println(med.getName() +" Medicine deleted successfully!");
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
 }
