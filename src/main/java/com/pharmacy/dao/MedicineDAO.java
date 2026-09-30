@@ -82,6 +82,21 @@ public class MedicineDAO {
 
     }
 
+    public void updateStock(int medicineId, int newQuantity) {
+        String sql = "UPDATE medicines SET quantity=? WHERE id=?";
+
+        try (
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ptmt = conn.prepareStatement(sql);) {
+            ptmt.setInt(1, newQuantity);
+            ptmt.setInt(2, medicineId);
+            ptmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println("SQL Exception" + e.getMessage());
+        }
+    }
+
     public void updateMedicine(int id, Medicine medicine) {
         String sql = "UPDATE medicines SET name = ? , manufacturer = ? , manufacturing_date = ? , expiry_date = ? , quantity = ? , price = ? WHERE id = ?";
         try (
@@ -103,18 +118,17 @@ public class MedicineDAO {
         }
     }
 
-    public void deleteMedicineById(int id){
+    public void deleteMedicineById(int id) {
         String sql = "DELETE FROM medicines WHERE id=?";
         try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement pstmtDelete = conn.prepareStatement(sql);
-        ){
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement pstmtDelete = conn.prepareStatement(sql);) {
             Medicine med = this.getMedicineById(id);
             pstmtDelete.setInt(1, id);
             pstmtDelete.executeUpdate();
-            System.out.println(med.getName() +" Medicine deleted successfully!");
+            System.out.println(med.getName() + " Medicine deleted successfully!");
 
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

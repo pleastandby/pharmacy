@@ -39,6 +39,10 @@ public class Sale {
         items.add(item);
     }
 
+    public List<SaleItem> getItems() {
+        return this.items;
+    }
+
     public double getTotalAmount() {
         double totalAmount = 0;
         for (SaleItem saleItem : items) {

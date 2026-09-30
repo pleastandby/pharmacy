@@ -5,6 +5,7 @@ import com.pharmacy.models.Sale;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,11 +17,16 @@ public class SaleDAO {
         String sql = "INSERT INTO sales(customer_id, total_amount) VALUES (?,?)";
         try (
                 Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement pstmtInsert = conn.prepareStatement(sql);) {
+                PreparedStatement pstmtInsert = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             pstmtInsert.setInt(1, sale.getCustomerId());
             pstmtInsert.setDouble(2, sale.getTotalAmount());
 
             pstmtInsert.executeUpdate();
+            try (ResultSet rs = pstmtInsert.getGeneratedKeys();) {
+                if (rs.next()) {
+                    sale.setId(rs.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             System.out.println("SQL Exception : " + e.getMessage());
         }
@@ -47,11 +53,13 @@ public class SaleDAO {
                 Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement pstmtSelect = conn.prepareStatement(sql);) {
             pstmtSelect.setInt(1, id);
-            ResultSet rs = pstmtSelect.executeQuery();
-            if (rs.next()) {
-                Sale sale = new Sale(rs.getInt("customer_id"));
-                sale.setId(rs.getInt("id"));
-                return sale;
+            try (ResultSet rs = pstmtSelect.executeQuery();) {
+                if (rs.next()) {
+                    Sale sale = new Sale(rs.getInt("customer_id"));
+                    sale.setId(rs.getInt("id"));
+                    sale.setSaleDate(rs.getTimestamp("sale_date").toLocalDateTime());
+                    return sale;
+                }
             }
             return null;
         } catch (SQLException e) {
@@ -65,14 +73,16 @@ public class SaleDAO {
         try (
                 Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement pstmtSelect = conn.prepareStatement(sql);) {
-            ResultSet rs = pstmtSelect.executeQuery();
-            List<Sale> saleList = new ArrayList<>();
-            while (rs.next()) {
-                Sale sale = new Sale(rs.getInt("customer_id"));
-                sale.setId(rs.getInt("id"));
-                saleList.add(sale);
+            try (ResultSet rs = pstmtSelect.executeQuery();) {
+                List<Sale> saleList = new ArrayList<>();
+                while (rs.next()) {
+                    Sale sale = new Sale(rs.getInt("customer_id"));
+                    sale.setId(rs.getInt("id"));
+                    sale.setSaleDate(rs.getTimestamp("sale_date").toLocalDateTime());
+                    saleList.add(sale);
+                }
+                return saleList;
             }
-            return saleList;
         } catch (SQLException e) {
             System.out.println("SQL Exception : " + e.getMessage());
             return null;
@@ -80,6 +90,8 @@ public class SaleDAO {
     }
 
     public void deleteSale(int id) {
+        SaleItemDAO saleItemDAO = new SaleItemDAO();
+        saleItemDAO.deleteSaleItemsBySaleId(id);
         String sql = "DELETE FROM sales WHERE id=?";
         try (
                 Connection conn = DatabaseConnection.getConnection();
@@ -90,5 +102,4 @@ public class SaleDAO {
             System.out.println("SQL Exception : " + e.getMessage());
         }
     }
-
 }

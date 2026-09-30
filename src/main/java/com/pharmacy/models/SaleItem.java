@@ -34,6 +34,10 @@ public class SaleItem {
         return this.price;
     }
 
+    public void setSaleId(int saleId) {
+        this.saleId = saleId;
+    }
+
     public void setQuantity(int quantity) {
         if (quantity > 0) {
             this.quantity = quantity;

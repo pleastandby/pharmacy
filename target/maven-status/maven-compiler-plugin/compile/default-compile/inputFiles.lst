@@ -1,5 +1,8 @@
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\dao\CustomerDAO.java
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\dao\MedicineDAO.java
+C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\dao\SaleDAO.java
+C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\dao\SaleItemDAO.java
+C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\dao\UserDAO.java
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\database\DatabaseConnection.java
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\Main.java
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\models\Customer.java
@@ -7,3 +10,5 @@ C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\models\Sale.java
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\models\SaleItem.java
 C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\models\User.java
+C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\service\MedicineService.java
+C:\Users\victus\OneDrive\Desktop\oops_project\PharmacyManagementSystem\pharmacy-management-system\src\main\java\com\pharmacy\service\SaleService.java

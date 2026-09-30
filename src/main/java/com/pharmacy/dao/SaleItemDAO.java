@@ -88,4 +88,16 @@ public class SaleItemDAO {
         }
     }
 
+    public void deleteSaleItemsBySaleId(int saleId) {
+        String sql = "DELETE FROM sale_items WHERE sale_id=?";
+        try (
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ptmt = conn.prepareStatement(sql);) {
+            ptmt.setInt(1, saleId);
+            ptmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("SQL Exception : " + e.getMessage());
+        }
+    }
+
 }
