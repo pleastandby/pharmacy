@@ -1,5 +1,10 @@
 package com.pharmacy.service;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import com.pharmacy.database.DatabaseConnection;
+
 import com.pharmacy.models.Sale;
 import com.pharmacy.models.SaleItem;
 import com.pharmacy.models.Medicine;
@@ -49,6 +54,7 @@ public class SaleService {
     }
 
     public boolean processSale(Sale sale) {
+
         if (sale == null) {
             System.out.println("Sale cannot be null!");
             return false;
@@ -69,20 +75,45 @@ public class SaleService {
             }
         }
 
-        double total = sale.getTotalAmount();
-        saleDAO.addSale(sale);
+        Connection conn = DatabaseConnection.getConnection();
 
-        System.out.println("Sale ID: " + sale.getId());
+        try {
+            conn.setAutoCommit(false);
 
-        for (SaleItem item : sale.getItems()) {
-            item.setSaleId(sale.getId());
-            saleItemDAO.addSaleItem(item);
+            double total = sale.getTotalAmount();
+            saleDAO.addSale(sale, conn);
 
-            Medicine medicine = medicineDAO.getMedicineById(item.getMedicineId());
-            sellMedicine(medicine, item.getQuantity());
-            medicineDAO.updateStock(medicine.getId(), medicine.getQuantity());
+            System.out.println("Sale ID: " + sale.getId());
+
+            for (SaleItem item : sale.getItems()) {
+                item.setSaleId(sale.getId());
+                saleItemDAO.addSaleItem(item, conn);
+
+                Medicine medicine = medicineDAO.getMedicineById(item.getMedicineId(), conn);
+                if (!sellMedicine(medicine, item.getQuantity())) {
+                    throw new SQLException("Failed to reduce medicine stock.");
+                }
+
+                medicineDAO.updateStock(medicine.getId(), medicine.getQuantity(), conn);
+            }
+            System.out.println("Sale Total: " + total);
+            conn.commit();
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackException) {
+                System.out.println("Error: " + rollbackException.getMessage());
+            }
+            System.out.println("Error: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException closeException) {
+                System.out.println("Error: " + closeException.getMessage());
+            }
         }
-        System.out.println("Sale Total: " + total);
 
         return true;
     }

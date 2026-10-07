@@ -13,11 +13,10 @@ import java.util.List;
 
 public class SaleDAO {
 
-    public void addSale(Sale sale) {
+    public void addSale(Sale sale, Connection conn) throws SQLException {
         String sql = "INSERT INTO sales(customer_id, total_amount) VALUES (?,?)";
-        try (
-                Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement pstmtInsert = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+        try (PreparedStatement pstmtInsert = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+
             pstmtInsert.setInt(1, sale.getCustomerId());
             pstmtInsert.setDouble(2, sale.getTotalAmount());
 
@@ -27,8 +26,6 @@ public class SaleDAO {
                     sale.setId(rs.getInt(1));
                 }
             }
-        } catch (SQLException e) {
-            System.out.println("SQL Exception : " + e.getMessage());
         }
     }
 

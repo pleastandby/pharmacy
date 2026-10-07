@@ -56,6 +56,33 @@ public class MedicineDAO {
         }
     }
 
+    // we're overloading this for the sale transactions
+    public Medicine getMedicineById(int id, Connection conn) throws SQLException {
+        String sql = "SELECT * FROM medicines WHERE id=?";
+
+        try (PreparedStatement pstmtSelect = conn.prepareStatement(sql)) {
+
+            pstmtSelect.setInt(1, id);
+
+            try (ResultSet rs = pstmtSelect.executeQuery()) {
+                if (rs.next()) {
+                    Medicine med = new Medicine(
+                            rs.getString("name"),
+                            rs.getString("manufacturer"),
+                            rs.getDate("manufacturing_date").toLocalDate(),
+                            rs.getDate("expiry_date").toLocalDate(),
+                            rs.getInt("quantity"),
+                            rs.getDouble("price"));
+
+                    med.setId(rs.getInt("id"));
+                    return med;
+                }
+
+                return null;
+            }
+        }
+    }
+
     public List<Medicine> getAllMedicines() {
         String sql = "SELECT * FROM medicines";
         try (
@@ -82,17 +109,15 @@ public class MedicineDAO {
 
     }
 
-    public void updateStock(int medicineId, int newQuantity) {
+    public void updateStock(int medicineId, int newQuantity, Connection conn) throws SQLException {
         String sql = "UPDATE medicines SET quantity=? WHERE id=?";
 
-        try (
-                Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement ptmt = conn.prepareStatement(sql);) {
+        try (PreparedStatement ptmt = conn.prepareStatement(sql);) {
             ptmt.setInt(1, newQuantity);
             ptmt.setInt(2, medicineId);
             ptmt.executeUpdate();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("SQL Exception" + e.getMessage());
         }
     }

@@ -12,12 +12,10 @@ import java.util.List;
 
 public class SaleItemDAO {
 
-    public void addSaleItem(SaleItem saleItem) {
+    public void addSaleItem(SaleItem saleItem, Connection conn) throws SQLException {
         String sql = "INSERT INTO sale_items(sale_id, medicine_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?)";
 
-        try (
-                Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement ptmt = conn.prepareStatement(sql);) {
+        try (PreparedStatement ptmt = conn.prepareStatement(sql);) {
             ptmt.setInt(1, saleItem.getSaleId());
             ptmt.setInt(2, saleItem.getMedicineId());
             ptmt.setInt(3, saleItem.getQuantity());
@@ -25,8 +23,6 @@ public class SaleItemDAO {
             ptmt.setDouble(5, saleItem.getSubTotal());
 
             ptmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("SQL EXCEPTION: " + e.getMessage());
         }
     }
 
