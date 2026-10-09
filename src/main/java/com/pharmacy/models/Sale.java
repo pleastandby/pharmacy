@@ -13,7 +13,15 @@ public class Sale {
 
     public Sale(int customerId) {
         this.customerId = customerId;
-        items = new ArrayList<>();
+        this.items = new ArrayList<>();
+    }
+
+    public Sale(int id, int customerId, LocalDateTime saleDate, double totalAmount) {
+        this.id = id;
+        this.customerId = customerId;
+        this.saleDate = saleDate;
+        this.totalAmount = totalAmount;
+        this.items = new ArrayList<>();
     }
 
     public int getId() {
@@ -44,6 +52,10 @@ public class Sale {
         return this.items;
     }
 
+    public void setItems(List<SaleItem> items) {
+        this.items = items != null ? items : new ArrayList<>();
+    }
+
     public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
     }
@@ -54,7 +66,6 @@ public class Sale {
         }
 
         double total = 0;
-
         for (SaleItem saleItem : items) {
             total += saleItem.getSubTotal();
         }
@@ -68,5 +79,16 @@ public class Sale {
 
     public void setSaleDate(LocalDateTime saleDate) {
         this.saleDate = saleDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Sale{" +
+                "id=" + id +
+                ", customerId=" + customerId +
+                ", saleDate=" + saleDate +
+                ", totalAmount=" + getTotalAmount() +
+                ", itemsCount=" + (items != null ? items.size() : 0) +
+                '}';
     }
 }
