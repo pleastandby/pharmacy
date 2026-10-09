@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.pharmacy.dao.CustomerDAO;
+import com.pharmacy.service.MedicineService;
 import com.pharmacy.service.SaleService;
 
 public class Main {
@@ -108,10 +109,55 @@ public class Main {
         }
     }
 
+    public void medicineListTest() {
+        MedicineService medicineService = new MedicineService();
+
+        List<Medicine> medicines = medicineService.getAllMedicines();
+
+        for (Medicine medicine : medicines) {
+            System.out.println(
+                    medicine.getId() + " - " +
+                            medicine.getName() + " - " +
+                            medicine.getQuantity());
+        }
+    }
+
+    public void expiredMedicinesTest() {
+        MedicineService medicineService = new MedicineService();
+
+        List<Medicine> expired = medicineService.getExpiredMedicines();
+
+        if (expired.isEmpty()) {
+            System.out.println("No expired medicines found.");
+            return;
+        }
+
+        for (Medicine medicine : expired) {
+            System.out.println(
+                    medicine.getId() + " - " +
+                            medicine.getName() + " - " +
+                            medicine.getExpiryDate());
+        }
+
+        List<Medicine> nearingExpiry = medicineService.getMedicinesNearingExpiry(90);
+
+        System.out.println("-----------------------------");
+        System.out.println("Medicines Nearing Expiry (90 days)");
+        System.out.println("-----------------------------");
+        for (Medicine medicine : nearingExpiry) {
+            System.out.println(
+                    medicine.getId() + " - " +
+                            medicine.getName() + " - " +
+                            medicine.getExpiryDate());
+        }
+    }
+
     public static void main(String[] args) {
         Main test = new Main();
         // test.saleTest();
         // test.salesHistoryTest();
-        test.searchSaleTest();
+        // test.searchSaleTest();
+        // test.medicineListTest();
+        test.expiredMedicinesTest();
     }
 }

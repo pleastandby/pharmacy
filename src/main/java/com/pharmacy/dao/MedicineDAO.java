@@ -12,46 +12,60 @@ import java.util.ArrayList;
 public class MedicineDAO {
 
     public void addMedicine(Medicine medicine) {
-        String sql = "INSERT INTO medicines(name, manufacturer, manufacturing_date, expiry_date, quantity, price) VALUES (?,?,?,?,?,?)";
-        try (
-                Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement pstmtInsert = conn.prepareStatement(sql);) {
-            pstmtInsert.setString(1, medicine.getName());
-            pstmtInsert.setString(2, medicine.getManufacturer());
-            pstmtInsert.setDate(3, java.sql.Date.valueOf(medicine.getManufacturingDate()));
-            pstmtInsert.setDate(4, java.sql.Date.valueOf(medicine.getExpiryDate()));
-            pstmtInsert.setInt(5, medicine.getQuantity());
-            pstmtInsert.setDouble(6, medicine.getPrice());
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                throw new SQLException("Could not connect to database.");
+            }
 
-            pstmtInsert.executeUpdate();
-            System.out.println("Medicine added successfully!");
+            addMedicine(medicine, conn);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Failed to add medicine: " + e.getMessage());
+        }
+    }
+
+    // Connection-aware operation
+    public void addMedicine(Medicine medicine, Connection conn)
+            throws SQLException {
+
+        String sql = "INSERT INTO medicines "
+                + "(name, manufacturer, manufacturing_date, expiry_date, quantity, price) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, medicine.getName());
+            pstmt.setString(2, medicine.getManufacturer());
+
+            if (medicine.getManufacturingDate() != null) {
+                pstmt.setDate(3,
+                        java.sql.Date.valueOf(medicine.getManufacturingDate()));
+            } else {
+                pstmt.setNull(3, java.sql.Types.DATE);
+            }
+
+            pstmt.setDate(4,
+                    java.sql.Date.valueOf(medicine.getExpiryDate()));
+            pstmt.setInt(5, medicine.getQuantity());
+            pstmt.setDouble(6, medicine.getPrice());
+
+            int rowsInserted = pstmt.executeUpdate();
+
+            if (rowsInserted == 0) {
+                throw new SQLException("Medicine was not inserted.");
+            }
         }
     }
 
     public Medicine getMedicineById(int id) {
-        String sql = "SELECT * FROM medicines where id=?";
-        try (
-                Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement pstmtSelect = conn.prepareStatement(sql);) {
-            pstmtSelect.setInt(1, id);
-            ResultSet rs = pstmtSelect.executeQuery();
-            if (rs.next()) {
-                Medicine med = new Medicine(
-                        rs.getString("name"),
-                        rs.getString("manufacturer"),
-                        rs.getDate("manufacturing_date").toLocalDate(),
-                        rs.getDate("expiry_date").toLocalDate(),
-                        rs.getInt("quantity"),
-                        rs.getDouble("price"));
-                med.setId(rs.getInt("id"));
-                return med;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                throw new SQLException("Could not connect to database.");
             }
-            return null;
+
+            return getMedicineById(id, conn);
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Failed to retrieve medicine: " + e.getMessage());
             return null;
         }
     }
@@ -109,16 +123,20 @@ public class MedicineDAO {
 
     }
 
-    public void updateStock(int medicineId, int newQuantity, Connection conn) throws SQLException {
-        String sql = "UPDATE medicines SET quantity=? WHERE id=?";
+    public void updateStock(int medicineId, int newQuantity, Connection conn)
+            throws SQLException {
 
-        try (PreparedStatement ptmt = conn.prepareStatement(sql);) {
-            ptmt.setInt(1, newQuantity);
-            ptmt.setInt(2, medicineId);
-            ptmt.executeUpdate();
+        String sql = "UPDATE medicines SET quantity = ? WHERE id = ?";
 
-        } catch (SQLException e) {
-            System.out.println("SQL Exception" + e.getMessage());
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, newQuantity);
+            pstmt.setInt(2, medicineId);
+
+            int rowsUpdated = pstmt.executeUpdate();
+
+            if (rowsUpdated == 0) {
+                throw new SQLException("Medicine not found: " + medicineId);
+            }
         }
     }
 
