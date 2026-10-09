@@ -9,6 +9,7 @@ public class Sale {
     private int customerId;
     private LocalDateTime saleDate;
     private List<SaleItem> items;
+    private double totalAmount;
 
     public Sale(int customerId) {
         this.customerId = customerId;
@@ -43,12 +44,22 @@ public class Sale {
         return this.items;
     }
 
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
     public double getTotalAmount() {
-        double totalAmount = 0;
-        for (SaleItem saleItem : items) {
-            totalAmount += saleItem.getSubTotal();
+        if (items.isEmpty()) {
+            return totalAmount;
         }
-        return totalAmount;
+
+        double total = 0;
+
+        for (SaleItem saleItem : items) {
+            total += saleItem.getSubTotal();
+        }
+
+        return total;
     }
 
     public LocalDateTime getSaleDate() {

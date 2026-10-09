@@ -2,8 +2,8 @@ package com.pharmacy.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import com.pharmacy.database.DatabaseConnection;
+import java.util.List;
 
 import com.pharmacy.models.Sale;
 import com.pharmacy.models.SaleItem;
@@ -116,6 +116,42 @@ public class SaleService {
         }
 
         return true;
+    }
+
+    public List<Sale> getSalesHistory() throws SQLException {
+        return saleDAO.getAllSales();
+    }
+
+    public Sale getSaleDetails(int saleId) throws SQLException {
+        Sale sale = saleDAO.getSaleById(saleId);
+
+        if (sale == null) {
+            return null;
+        }
+
+        List<SaleItem> items = getSaleItems(saleId);
+
+        for (SaleItem item : items) {
+            sale.addItem(item);
+        }
+
+        return sale;
+    }
+
+    public List<SaleItem> getSaleItems(int saleId) {
+        return saleItemDAO.getSaleItemsBySaleId(saleId);
+    }
+
+    public Medicine getMedicineForSaleItem(int medicineId) {
+        return medicineDAO.getMedicineById(medicineId);
+    }
+
+    public Sale searchSaleById(int saleId) throws SQLException {
+        if (saleId <= 0) {
+            return null;
+        }
+
+        return getSaleDetails(saleId);
     }
 
 }

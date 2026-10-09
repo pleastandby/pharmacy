@@ -65,24 +65,27 @@ public class SaleDAO {
         }
     }
 
-    public List<Sale> getAllSales() {
+    public List<Sale> getAllSales(Connection conn) throws SQLException {
         String sql = "SELECT * FROM sales";
-        try (
-                Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement pstmtSelect = conn.prepareStatement(sql);) {
+        try (PreparedStatement pstmtSelect = conn.prepareStatement(sql);) {
             try (ResultSet rs = pstmtSelect.executeQuery();) {
                 List<Sale> saleList = new ArrayList<>();
                 while (rs.next()) {
                     Sale sale = new Sale(rs.getInt("customer_id"));
                     sale.setId(rs.getInt("id"));
                     sale.setSaleDate(rs.getTimestamp("sale_date").toLocalDateTime());
+                    sale.setTotalAmount(rs.getDouble("total_amount"));
+
                     saleList.add(sale);
                 }
                 return saleList;
             }
-        } catch (SQLException e) {
-            System.out.println("SQL Exception : " + e.getMessage());
-            return null;
+        }
+    }
+
+    public List<Sale> getAllSales() throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return getAllSales(conn);
         }
     }
 
