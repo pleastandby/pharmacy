@@ -143,11 +143,11 @@ public class SaleService {
             return false;
         }
 
-        // Aggregate required quantities per medicine ID to ensure combined item totals don't exceed stock
         Map<Integer, Integer> requiredStock = new HashMap<>();
         for (SaleItem item : sale.getItems()) {
             if (item.getQuantity() <= 0) {
-                System.err.println("Invalid quantity (" + item.getQuantity() + ") for medicine ID: " + item.getMedicineId());
+                System.err.println(
+                        "Invalid quantity (" + item.getQuantity() + ") for medicine ID: " + item.getMedicineId());
                 return false;
             }
             if (item.getPrice() < 0) {
@@ -168,7 +168,8 @@ public class SaleService {
             }
 
             if (medicine.isExpired()) {
-                System.err.println("Cannot process sale: Medicine '" + medicine.getName() + "' (ID: " + medicineId + ") is expired!");
+                System.err.println("Cannot process sale: Medicine '" + medicine.getName() + "' (ID: " + medicineId
+                        + ") is expired!");
                 return false;
             }
 

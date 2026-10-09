@@ -29,29 +29,44 @@ public class SaleDAO {
     }
 
     public boolean addSale(Sale sale, Connection conn) throws SQLException {
+        if (sale == null) {
+            throw new SQLException("Sale cannot be null.");
+        }
+
+        if (conn == null) {
+            throw new SQLException("Database connection cannot be null.");
+        }
+
         String sql;
         boolean hasDate = sale.getSaleDate() != null;
+
         if (hasDate) {
             sql = "INSERT INTO sales(customer_id, total_amount, sale_date) VALUES (?, ?, ?)";
         } else {
             sql = "INSERT INTO sales(customer_id, total_amount) VALUES (?, ?)";
         }
 
-        try (PreparedStatement pstmtInsert = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmtInsert.setInt(1, sale.getCustomerId());
-            pstmtInsert.setDouble(2, sale.getTotalAmount());
+        try (PreparedStatement pstmt = conn.prepareStatement(
+                sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setInt(1, sale.getCustomerId());
+            pstmt.setDouble(2, sale.getTotalAmount());
+
             if (hasDate) {
-                pstmtInsert.setTimestamp(3, Timestamp.valueOf(sale.getSaleDate()));
+                pstmt.setTimestamp(3, Timestamp.valueOf(sale.getSaleDate()));
             }
 
-            int rows = pstmtInsert.executeUpdate();
+            int rows = pstmt.executeUpdate();
+
             if (rows == 0) {
                 throw new SQLException("Failed to insert sale.");
             }
 
-            try (ResultSet rs = pstmtInsert.getGeneratedKeys()) {
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     sale.setId(rs.getInt(1));
+                } else {
+                    throw new SQLException("Sale inserted, but no generated ID was returned.");
                 }
             }
 
@@ -103,7 +118,7 @@ public class SaleDAO {
     public List<Sale> getAllSales(Connection conn) throws SQLException {
         String sql = "SELECT * FROM sales ORDER BY id DESC";
         try (PreparedStatement pstmtSelect = conn.prepareStatement(sql);
-             ResultSet rs = pstmtSelect.executeQuery()) {
+                ResultSet rs = pstmtSelect.executeQuery()) {
             List<Sale> saleList = new ArrayList<>();
             while (rs.next()) {
                 saleList.add(mapResultSetToSale(rs));
@@ -152,7 +167,8 @@ public class SaleDAO {
         }
     }
 
-    public List<Sale> getSalesBetweenDates(LocalDateTime startDate, LocalDateTime endDate, Connection conn) throws SQLException {
+    public List<Sale> getSalesBetweenDates(LocalDateTime startDate, LocalDateTime endDate, Connection conn)
+            throws SQLException {
         String sql = "SELECT * FROM sales WHERE sale_date >= ? AND sale_date <= ? ORDER BY sale_date DESC";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setTimestamp(1, Timestamp.valueOf(startDate));
