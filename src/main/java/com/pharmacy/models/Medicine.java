@@ -66,10 +66,10 @@ public class Medicine {
     }
 
     public void setQuantity(int quantity) {
-        if (quantity > 0) {
+        if (quantity >= 0) {
             this.quantity = quantity;
         } else {
-            System.err.println("Quantity must be greater than 0!");
+            System.err.println("Quantity cannot be negative!");
         }
     }
 
@@ -105,4 +105,16 @@ public class Medicine {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Medicine{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", manufacturingDate=" + manufacturingDate +
+                ", expiryDate=" + expiryDate +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                '}';
+    }
 }
